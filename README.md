@@ -442,3 +442,9 @@ npm run build
 ## 📄 License
 
 本项目基于 [MIT License](LICENSE) 开源。
+
+---
+
+<p align="center">
+  <a href="https://linux.do/"><strong>认可 LINUXDO 社区</strong></a>
+</p>
