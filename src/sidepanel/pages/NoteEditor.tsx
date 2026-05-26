@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import { useNoteStore } from '@/stores/noteStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -110,7 +110,7 @@ export default function NoteEditor({ note, initialProblem, onClose }: Props) {
             <button
               onClick={handleAiGenerate}
               disabled={aiGenerating || !title.trim()}
-              className="px-3 py-1.5 rounded-lg bg-purple-500 text-white text-sm font-medium hover:bg-purple-600 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-sky-400 text-white text-sm font-medium hover:bg-sky-500 disabled:opacity-50"
             >
               {aiGenerating ? 'AI 生成中...' : 'AI 生成笔记'}
             </button>
@@ -247,3 +247,4 @@ export default function NoteEditor({ note, initialProblem, onClose }: Props) {
     </div>
   );
 }
+

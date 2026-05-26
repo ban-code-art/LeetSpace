@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePlanStore } from '@/stores/planStore';
 import { useNoteStore } from '@/stores/noteStore';
@@ -59,15 +59,23 @@ export default function App() {
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
       {generating && (
-        <div className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-purple-500 text-white text-xs text-center animate-pulse">
+        <div className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-cyan-300 text-white text-xs text-center animate-pulse">
           AI 正在生成笔记...
         </div>
       )}
       <main className="relative z-10 flex-1 overflow-y-auto px-5 pb-3 pt-5">
-        {page === 'plan' && <Plan onOpenNote={(problem) => { setNoteProblem(problem); setPage('notes'); }} />}
-        {page === 'notes' && <Notes initialProblem={noteProblem} onInitialProblemHandled={() => setNoteProblem(null)} />}
-        {page === 'ai' && <AI />}
-        {page === 'settings' && <Settings />}
+        <div className={page === 'plan' ? 'block h-full' : 'hidden h-full'}>
+          <Plan onOpenNote={(problem) => { setNoteProblem(problem); setPage('notes'); }} />
+        </div>
+        <div className={page === 'notes' ? 'block h-full' : 'hidden h-full'}>
+          <Notes initialProblem={noteProblem} onInitialProblemHandled={() => setNoteProblem(null)} />
+        </div>
+        <div className={page === 'ai' ? 'block h-full' : 'hidden h-full'}>
+          <AI />
+        </div>
+        <div className={page === 'settings' ? 'block h-full' : 'hidden h-full'}>
+          <Settings />
+        </div>
       </main>
       <div className="relative z-20">
         <Navigation current={page} onChange={setPage} />
@@ -75,3 +83,4 @@ export default function App() {
     </div>
   );
 }
+

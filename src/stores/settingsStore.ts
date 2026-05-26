@@ -22,6 +22,9 @@ const defaultSettings: Settings = {
   floatingWidget: {
     enabled: true,
     showMode: 'unfinished',
+    showTimer: true,
+    showQuote: true,
+    showProgress: true,
     quotes: ['坚持就是胜利', '每天进步一点点', '算法之路，贵在坚持'],
   },
   notePrompts: DEFAULT_NOTE_PROMPTS,
@@ -40,7 +43,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   load: async () => {
     const saved = await storage.get<Settings>(STORAGE_KEY);
-    const settings = saved ? { ...defaultSettings, ...saved } : defaultSettings;
+    const settings = saved ? {
+      ...defaultSettings,
+      ...saved,
+      ai: { ...defaultSettings.ai, ...saved.ai },
+      floatingWidget: { ...defaultSettings.floatingWidget, ...saved.floatingWidget },
+      notePrompts: saved.notePrompts || defaultSettings.notePrompts,
+    } : defaultSettings;
     if (!saved) {
       await storage.set(STORAGE_KEY, settings);
     }

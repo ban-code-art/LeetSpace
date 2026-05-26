@@ -50,6 +50,9 @@ export interface NotePromptOption {
 export interface FloatingWidgetConfig {
   enabled: boolean;
   showMode: 'always' | 'unfinished';
+  showTimer: boolean;
+  showQuote: boolean;
+  showProgress: boolean;
   quotes: string[];
 }
 

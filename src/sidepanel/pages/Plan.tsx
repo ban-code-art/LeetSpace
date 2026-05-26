@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { usePlanStore } from '@/stores/planStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useNoteStore } from '@/stores/noteStore';
@@ -9,7 +9,7 @@ import BatchImport from '../components/BatchImport';
 import { fetchAcceptedTitleSlugs } from '@/services/leetcodeProgress';
 
 const groupIcons = [
-  { icon: '🗄️', className: 'from-violet-400 to-indigo-500' },
+  { icon: '🗄️', className: 'from-sky-300 to-cyan-400' },
   { icon: '</>', className: 'from-sky-400 to-blue-600' },
   { icon: '🏆', className: 'from-amber-300 to-orange-500' },
   { icon: '📘', className: 'from-emerald-300 to-teal-500' },
@@ -111,7 +111,7 @@ function PlanGroupCard({ group, index, onOpenNote }: { group: PlanGroup; index: 
 
       <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200/55">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-fuchsia-400 transition-all duration-500 progress-bar"
+          className="h-full rounded-full bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300 transition-all duration-500 progress-bar"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -190,7 +190,7 @@ export default function Plan({ onOpenNote }: Props) {
 
           <div className="mt-8 h-2.5 overflow-hidden rounded-full bg-slate-200/50">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-fuchsia-400 progress-bar"
+              className="h-full rounded-full bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300 progress-bar"
               style={{ width: `${overallProgress}%` }}
             />
           </div>
@@ -214,3 +214,4 @@ export default function Plan({ onOpenNote }: Props) {
     </div>
   );
 }
+

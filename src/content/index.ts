@@ -11,6 +11,8 @@ type ProblemLike = {
 };
 
 type JsonObject = Record<string, unknown>;
+type ScanSource = 'api' | 'hydration' | 'dom';
+type ScannedProblem = Problem & { source?: ScanSource; hasExplicitDifficulty?: boolean };
 
 function parseDifficulty(el: Element | null): 'Easy' | 'Medium' | 'Hard' {
   if (!el) return 'Medium';
@@ -60,20 +62,106 @@ function normalizeText(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-function getDifficultyFromText(text: string): 'Easy' | 'Medium' | 'Hard' {
-  if (text.includes('简单') || text.includes('Easy')) return 'Easy';
-  if (text.includes('困难') || text.includes('Hard')) return 'Hard';
-  return 'Medium';
+function getExplicitDifficultyFromText(text: string): 'Easy' | 'Medium' | 'Hard' | null {
+  const matches = Array.from(text.matchAll(/困难|中等|简单|Hard|Medium|Easy/gi));
+  const last = matches.length > 0 ? matches[matches.length - 1][0] : '';
+  if (/困难|Hard/i.test(last)) return 'Hard';
+  if (/中等|Medium/i.test(last)) return 'Medium';
+  if (/简单|Easy/i.test(last)) return 'Easy';
+  return null;
 }
 
-function normalizeDifficulty(value: unknown): 'Easy' | 'Medium' | 'Hard' {
+function getDifficultyFromClassName(el: Element | null): 'Easy' | 'Medium' | 'Hard' | null {
+  if (!el) return null;
+  const text = String((el as HTMLElement).className || '').toLowerCase();
+  if (/difficulty[-_\s]?hard|text-difficulty-hard|\bhard\b/.test(text)) return 'Hard';
+  if (/difficulty[-_\s]?medium|text-difficulty-medium|\bmedium\b/.test(text)) return 'Medium';
+  if (/difficulty[-_\s]?easy|text-difficulty-easy|\beasy\b/.test(text)) return 'Easy';
+  return null;
+}
+
+function inferDifficulty(row: Element | null, linkEl: Element): 'Easy' | 'Medium' | 'Hard' {
+  const candidates = [
+    linkEl,
+    row,
+    ...(row ? Array.from(row.querySelectorAll('[class*="difficulty"], [class*="Difficulty"], [class*="easy"], [class*="medium"], [class*="hard"]')) : []),
+  ].filter(Boolean) as Element[];
+
+  for (const candidate of candidates) {
+    const fromClass = getDifficultyFromClassName(candidate);
+    if (fromClass) return fromClass;
+  }
+
+  const rowText = normalizeText(row?.textContent || linkEl.textContent || '');
+  return getExplicitDifficultyFromText(rowText) || 'Medium';
+}
+
+function findProblemRow(linkEl: Element): Element | null {
+  let current: Element | null = linkEl;
+
+  for (let depth = 0; current && depth < 8; depth += 1) {
+    const text = normalizeText(current.textContent || '');
+    const hasDifficulty = /简单|中等|困难|Easy|Medium|Hard/i.test(text);
+    const hasAcceptRate = /\d+(?:\.\d+)?%/.test(text);
+    const problemLinks = Array.from(current.querySelectorAll('a[href*="/problems/"]'));
+    const distinctProblemLinks = new Set(
+      problemLinks
+        .map((link) => link.getAttribute('href')?.match(/\/problems\/([\w-]+)/)?.[1])
+        .filter(Boolean)
+    );
+    const isSingleProblemScope = distinctProblemLinks.size <= 1;
+    const isReasonableSize = text.length > 0 && text.length < 180;
+
+    if (isSingleProblemScope && isReasonableSize && (hasDifficulty || hasAcceptRate)) {
+      return current;
+    }
+
+    current = current.parentElement;
+  }
+
+  return linkEl.closest('[role="row"], tr, li') || linkEl.parentElement;
+}
+
+function cleanProblemTitle(text: string, slug: string): string {
+  const normalized = normalizeText(text);
+  const structuredMatch = normalized.match(/^\d+\.\s*(.+?)(?:\d+(?:\.\d+)?%|简单|中等|困难|Easy|Medium|Hard|$)/i);
+  const source = structuredMatch?.[1] || normalized;
+  const title = source
+    .replace(/^\d+\.\s*/, '')
+    .replace(/\d+(?:\.\d+)?%/g, '')
+    .replace(/\b(?:Easy|Medium|Hard)\b/gi, '')
+    .replace(/简单|中等|困难/g, '')
+    .replace(/[🔒锁]/g, '')
+    .trim();
+
+  return title || slug;
+}
+
+function extractTitleSource(linkEl: Element, row: Element | null): string {
+  const linkText = normalizeText(linkEl.textContent || '');
+  const rowText = normalizeText(row?.textContent || '');
+  const looksLikeOnlySlug = /^[a-z0-9-]+$/i.test(linkText);
+
+  if (!linkText || looksLikeOnlySlug || linkText.length < 2) {
+    return rowText;
+  }
+
+  if (/\d+(?:\.\d+)?%|简单|中等|困难|Easy|Medium|Hard/i.test(linkText)) {
+    return linkText;
+  }
+
+  return linkText;
+}
+
+function parseRawDifficulty(value: unknown): 'Easy' | 'Medium' | 'Hard' | null {
   const text = String(value || '').toLowerCase();
   if (text.includes('easy') || text.includes('简单')) return 'Easy';
+  if (text.includes('medium') || text.includes('中等')) return 'Medium';
   if (text.includes('hard') || text.includes('困难')) return 'Hard';
-  return 'Medium';
+  return null;
 }
 
-function normalizeProblem(raw: ProblemLike): Problem | null {
+function normalizeProblem(raw: ProblemLike, source: ScanSource = 'hydration'): ScannedProblem | null {
   if (typeof raw.titleSlug !== 'string' || !raw.titleSlug) return null;
 
   const title =
@@ -93,37 +181,41 @@ function normalizeProblem(raw: ProblemLike): Problem | null {
         .filter(Boolean)
     : [];
 
+  const explicitDifficulty = parseRawDifficulty(raw.difficulty);
+
   return {
     id: String(raw.questionFrontendId || raw.id || ''),
     title: normalizeText(title),
     titleSlug: raw.titleSlug,
-    difficulty: normalizeDifficulty(raw.difficulty),
+    difficulty: explicitDifficulty || 'Medium',
     tags,
     url: `https://leetcode.cn/problems/${raw.titleSlug}/`,
+    source,
+    hasExplicitDifficulty: Boolean(explicitDifficulty),
   };
 }
 
-function collectProblemsFromJson(value: unknown, collect: Map<string, Problem>): void {
+function collectProblemsFromJson(value: unknown, collect: Map<string, ScannedProblem>, source: ScanSource = 'hydration'): void {
   if (!value || typeof value !== 'object') return;
 
   if (Array.isArray(value)) {
-    value.forEach((item) => collectProblemsFromJson(item, collect));
+    value.forEach((item) => collectProblemsFromJson(item, collect, source));
     return;
   }
 
   const object = value as JsonObject;
-  const problem = normalizeProblem(object as ProblemLike);
+  const problem = normalizeProblem(object as ProblemLike, source);
   if (problem) collect.set(problem.titleSlug, problem);
 
-  Object.values(object).forEach((child) => collectProblemsFromJson(child, collect));
+  Object.values(object).forEach((child) => collectProblemsFromJson(child, collect, source));
 }
 
-function extractProblemListFromHydration(): Problem[] {
+function extractProblemListFromHydration(): ScannedProblem[] {
   const script = document.querySelector<HTMLScriptElement>('#__NEXT_DATA__');
   if (!script?.textContent) return [];
 
   try {
-    const collected = new Map<string, Problem>();
+    const collected = new Map<string, ScannedProblem>();
     collectProblemsFromJson(JSON.parse(script.textContent), collected);
     return Array.from(collected.values());
   } catch {
@@ -136,7 +228,11 @@ function getStudyPlanSlug(): string | null {
   return match?.[1] || null;
 }
 
-async function extractProblemListFromGraphQL(): Promise<Problem[]> {
+function isProblemsetPage(): boolean {
+  return /\/problemset\//.test(location.pathname);
+}
+
+async function extractProblemListFromGraphQL(): Promise<ScannedProblem[]> {
   const slug = getStudyPlanSlug();
   if (!slug) return [];
 
@@ -173,13 +269,59 @@ async function extractProblemListFromGraphQL(): Promise<Problem[]> {
   if (!response.ok) return [];
 
   const data = await response.json();
-  const collected = new Map<string, Problem>();
-  collectProblemsFromJson(data, collected);
+  const collected = new Map<string, ScannedProblem>();
+  collectProblemsFromJson(data, collected, 'api');
   return Array.from(collected.values());
 }
 
-function extractProblemList(): Problem[] {
-  const problems: Problem[] = [];
+async function extractProblemsetFromGraphQL(limit = 200): Promise<ScannedProblem[]> {
+  if (!isProblemsetPage()) return [];
+
+  const response = await fetch('https://leetcode.cn/graphql/', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      operationName: 'problemsetQuestionList',
+      variables: {
+        categorySlug: '',
+        skip: 0,
+        limit,
+        filters: {},
+      },
+      query: `query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
+        problemsetQuestionList(categorySlug: $categorySlug, limit: $limit, skip: $skip, filters: $filters) {
+          questions {
+            frontendQuestionId
+            title
+            titleSlug
+            translatedTitle
+            difficulty
+            topicTags { name nameTranslated slug }
+          }
+        }
+      }`,
+    }),
+  });
+
+  if (!response.ok) return [];
+
+  const data = await response.json();
+  const questions = data?.data?.problemsetQuestionList?.questions;
+  if (!Array.isArray(questions)) return [];
+
+  return questions
+    .map((question) => normalizeProblem({
+      ...(question as JsonObject),
+      questionFrontendId: (question as JsonObject).frontendQuestionId,
+    } as ProblemLike, 'api'))
+    .filter(Boolean) as ScannedProblem[];
+}
+
+function extractProblemList(): ScannedProblem[] {
+  const problems: ScannedProblem[] = [];
   const seen = new Set<string>();
 
   const links = document.querySelectorAll('a[href*="/problems/"]');
@@ -193,30 +335,54 @@ function extractProblemList(): Problem[] {
     if (seen.has(slug)) return;
     seen.add(slug);
 
-    const row = linkEl.closest('[role="row"], tr, li, div[class*="item"], div[class*="row"]') || linkEl.parentElement;
-    const titleText = normalizeText(linkEl.textContent || row?.textContent || '');
+    const row = findProblemRow(linkEl);
+    const titleText = extractTitleSource(linkEl, row);
     if (!titleText || titleText.length > 200) return;
 
     const idMatch = titleText.match(/^(\d+)\.\s*/);
-    const diffEl = row?.querySelector('[class*="difficulty"], [class*="easy"], [class*="medium"], [class*="hard"]') || null;
-    let difficulty = parseDifficulty(diffEl);
-
-    if (!diffEl && row) {
-      const rowText = row.textContent || '';
-      difficulty = getDifficultyFromText(rowText);
-    }
+    const difficulty = inferDifficulty(row, linkEl);
 
     problems.push({
       id: idMatch ? idMatch[1] : '',
-      title: normalizeText((linkEl.textContent || titleText).replace(/^\d+\.\s*/, '')),
+      title: cleanProblemTitle(linkEl.textContent || titleText, slug),
       titleSlug: slug,
       difficulty,
       tags: [],
       url: `https://leetcode.cn/problems/${slug}/`,
+      source: 'dom',
+      hasExplicitDifficulty: true,
     });
   });
 
   return problems;
+}
+
+function upsertScannedProblem(collect: Map<string, ScannedProblem>, problem: ScannedProblem): void {
+  const existing = collect.get(problem.titleSlug);
+  if (!existing) {
+    collect.set(problem.titleSlug, problem);
+    return;
+  }
+
+  const sourcePriority: Record<ScanSource, number> = {
+    api: 3,
+    dom: 2,
+    hydration: 1,
+  };
+
+  if (sourcePriority[problem.source || 'hydration'] > sourcePriority[existing.source || 'hydration']) {
+    collect.set(problem.titleSlug, { ...existing, ...problem });
+    return;
+  }
+
+  if (!existing.hasExplicitDifficulty && problem.hasExplicitDifficulty) {
+    collect.set(problem.titleSlug, { ...existing, ...problem });
+    return;
+  }
+
+  if (problem.source === 'api' && existing.source !== 'api') {
+    collect.set(problem.titleSlug, { ...existing, ...problem });
+  }
 }
 
 function wait(ms: number): Promise<void> {
@@ -231,7 +397,7 @@ function getScrollableElements(): Element[] {
   });
 }
 
-async function scanByScrollingElement(element: Element | Window, collect: Map<string, Problem>): Promise<void> {
+async function scanByScrollingElement(element: Element | Window, collect: Map<string, ScannedProblem>): Promise<void> {
   const isWindow = element === window;
   const scrollTarget = isWindow ? document.scrollingElement || document.documentElement : element as HTMLElement;
   const originalTop = isWindow ? window.scrollY : (scrollTarget as HTMLElement).scrollTop;
@@ -240,7 +406,7 @@ async function scanByScrollingElement(element: Element | Window, collect: Map<st
   let previousTop = -1;
 
   for (let i = 0; i < 35; i += 1) {
-    extractProblemList().forEach((problem) => collect.set(problem.titleSlug, problem));
+    extractProblemList().forEach((problem) => upsertScannedProblem(collect, problem));
 
     const nextTop = Math.min(
       scrollTarget.scrollHeight - scrollTarget.clientHeight,
@@ -264,24 +430,32 @@ async function scanByScrollingElement(element: Element | Window, collect: Map<st
     if (stableRounds >= 3) break;
   }
 
-  extractProblemList().forEach((problem) => collect.set(problem.titleSlug, problem));
+  extractProblemList().forEach((problem) => upsertScannedProblem(collect, problem));
 
   if (isWindow) window.scrollTo({ top: originalTop, behavior: 'auto' });
   else (scrollTarget as HTMLElement).scrollTop = originalTop;
 }
 
 async function extractProblemListDeep(): Promise<Problem[]> {
-  const collected = new Map<string, Problem>();
-  extractProblemListFromHydration().forEach((problem) => collected.set(problem.titleSlug, problem));
+  const collected = new Map<string, ScannedProblem>();
+  extractProblemListFromHydration().forEach((problem) => upsertScannedProblem(collected, problem));
 
-  if (collected.size === 0) {
+  const hasReliableDifficulty = Array.from(collected.values()).some((problem) => problem.hasExplicitDifficulty);
+  if (collected.size === 0 || !hasReliableDifficulty) {
     const graphQLProblems = await extractProblemListFromGraphQL();
-    graphQLProblems.forEach((problem) => collected.set(problem.titleSlug, problem));
+    graphQLProblems.forEach((problem) => upsertScannedProblem(collected, problem));
   }
 
-  if (collected.size >= 50) return Array.from(collected.values());
+  if (isProblemsetPage()) {
+    const problemsetProblems = await extractProblemsetFromGraphQL();
+    problemsetProblems.forEach((problem) => upsertScannedProblem(collected, problem));
+  }
 
-  extractProblemList().forEach((problem) => collected.set(problem.titleSlug, problem));
+  if (collected.size >= 50 && Array.from(collected.values()).some((problem) => problem.hasExplicitDifficulty)) {
+    return Array.from(collected.values());
+  }
+
+  extractProblemList().forEach((problem) => upsertScannedProblem(collected, problem));
 
   await scanByScrollingElement(window, collected);
 

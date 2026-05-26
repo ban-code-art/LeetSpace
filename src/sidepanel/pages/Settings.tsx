@@ -13,6 +13,12 @@ const providerLabels: Record<AiProvider, string> = {
   custom: 'OpenAI 兼容',
 };
 
+const floatingDisplayOptions = [
+  { key: 'showTimer', label: '计时器功能', description: '显示播放、暂停和重置计时' },
+  { key: 'showQuote', label: '励志标语', description: '显示自定义鼓励语' },
+  { key: 'showProgress', label: '题目完成数量', description: '显示今日完成进度' },
+] as const;
+
 export default function Settings() {
   const { settings, update } = useSettingsStore();
   const [testStatus, setTestStatus] = useState<TestStatus>('idle');
@@ -22,10 +28,14 @@ export default function Settings() {
   const enabledPromptCount = settings.notePrompts.filter((prompt) => prompt.enabled).length;
   const hasApiKey = Boolean(settings.ai.apiKey);
   const maskedKey = hasApiKey ? `已配置 · ${settings.ai.apiKey.slice(-4).padStart(8, '•')}` : '未配置 API Key';
+  const widgetDisplaySummary = floatingDisplayOptions
+    .filter((option) => settings.floatingWidget[option.key] !== false)
+    .map((option) => option.label.replace('功能', '').replace('题目', ''))
+    .join(' / ');
   const widgetSummary = settings.floatingWidget.enabled
     ? settings.floatingWidget.showMode === 'unfinished'
-      ? '仅未完成时显示'
-      : '始终显示'
+      ? `仅未完成时显示 · ${widgetDisplaySummary || '未选择内容'}`
+      : `始终显示 · ${widgetDisplaySummary || '未选择内容'}`
     : '已关闭';
 
   const handleTestApi = async () => {
@@ -193,7 +203,7 @@ export default function Settings() {
       {showAdvanced && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/35 backdrop-blur-sm" onClick={() => setShowAdvanced(false)}>
           <div
-            className="slide-up-enter max-h-[88vh] w-full overflow-y-auto rounded-t-3xl border border-[var(--border-glass)] bg-[var(--bg-primary)] p-4 shadow-2xl"
+            className="slide-up-enter max-h-[88vh] w-full overflow-y-auto rounded-t-3xl border border-[var(--border-glass)] bg-[var(--bg-primary)] p-4 pb-28 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-3">
@@ -320,13 +330,40 @@ export default function Settings() {
                     </select>
                   </div>
                   <div>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-2">显示内容</label>
+                    <div className="grid gap-2">
+                      {floatingDisplayOptions.map((option) => (
+                        <label key={option.key} className="flex items-start gap-2 rounded-xl bg-[var(--bg-secondary)] px-3 py-2 text-sm cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.floatingWidget[option.key] !== false}
+                            onChange={() => update({
+                              floatingWidget: {
+                                ...settings.floatingWidget,
+                                [option.key]: settings.floatingWidget[option.key] === false,
+                              },
+                            })}
+                            className="mt-0.5 rounded"
+                          />
+                          <span>
+                            <span className="block font-medium text-[var(--text-primary)]">{option.label}</span>
+                            <span className="block text-xs text-[var(--text-secondary)] mt-0.5">{option.description}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
                     <label className="block text-xs text-[var(--text-secondary)] mb-1">励志语（每行一条）</label>
                     <textarea
                       value={settings.floatingWidget.quotes.join('\n')}
-                      onChange={(e) => update({ floatingWidget: { ...settings.floatingWidget, quotes: e.target.value.split('\n').filter(Boolean) } })}
-                      rows={3}
-                      className="w-full px-3 py-2 rounded-xl border border-[var(--border-glass)] bg-[var(--glass-bg)] text-sm text-[var(--text-primary)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-30 transition-all duration-200"
+                      onChange={(e) => update({ floatingWidget: { ...settings.floatingWidget, quotes: e.target.value.split('\n').map((quote) => quote.trim()).filter(Boolean) } })}
+                      rows={5}
+                      disabled={settings.floatingWidget.showQuote === false}
+                      placeholder="坚持就是胜利&#10;每天进步一点点&#10;算法之路，贵在坚持"
+                      className="w-full px-3 py-2 rounded-xl border border-[var(--border-glass)] bg-[var(--glass-bg)] text-sm text-[var(--text-primary)] resize-y min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-30 transition-all duration-200 disabled:opacity-50"
                     />
+                    <p className="mt-1 text-xs text-[var(--text-secondary)]">开启“励志标语”后，悬浮窗会按天轮换显示这里的内容。</p>
                   </div>
                 </div>
               </section>

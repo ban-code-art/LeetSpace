@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import { useNoteStore } from '@/stores/noteStore';
 import { Note } from '@/types';
@@ -122,10 +122,10 @@ export default function NotesLibrary() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--bg-primary)]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-20 border-b border-sky-200/90 bg-[var(--bg-primary)]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1680px] items-center justify-between px-8 py-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-purple-500 text-xl text-white shadow-lg shadow-blue-500/20">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-cyan-300 text-xl text-white shadow-lg shadow-blue-500/20">
               📝
             </div>
             <div>
@@ -141,8 +141,8 @@ export default function NotesLibrary() {
       </header>
 
       <main className="mx-auto grid max-w-[1680px] grid-cols-[240px_440px_minmax(680px,1fr)] gap-5 px-8 py-6">
-        <aside className="glass-card h-[calc(100vh-132px)] overflow-hidden p-4">
-          <div className="mb-4 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-4">
+        <aside className="glass-card h-[calc(100vh-132px)] overflow-hidden border border-sky-300/80 p-4 shadow-[0_18px_44px_rgba(56,189,248,0.16)]">
+          <div className="mb-4 rounded-2xl bg-gradient-to-br from-sky-300/18 via-cyan-200/14 to-emerald-200/12 p-4">
             <p className="text-sm font-semibold">分类导航</p>
             <p className="mt-1 text-xs text-[var(--text-secondary)]">按算法标签快速定位笔记</p>
           </div>
@@ -167,7 +167,7 @@ export default function NotesLibrary() {
           </div>
         </aside>
 
-        <section className="glass-card h-[calc(100vh-132px)] overflow-hidden p-5">
+        <section className="glass-card h-[calc(100vh-132px)] overflow-hidden border border-sky-300/80 p-5 shadow-[0_18px_44px_rgba(56,189,248,0.16)]">
           <div className="rounded-3xl bg-white/45 p-4 shadow-sm">
             <input
               value={keyword}
@@ -207,7 +207,7 @@ export default function NotesLibrary() {
 
           <div className="mt-4 h-[calc(100%-154px)] space-y-3 overflow-y-auto pr-1">
             {filteredNotes.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-[var(--border)] p-10 text-center text-sm text-[var(--text-secondary)]">
+              <div className="rounded-3xl border border-dashed border-sky-300/90 p-10 text-center text-sm text-[var(--text-secondary)]">
                 没有匹配的笔记
               </div>
             ) : (
@@ -215,7 +215,7 @@ export default function NotesLibrary() {
                 <button
                   key={note.id}
                   onClick={() => setSelectedId(note.id)}
-                  className={`w-full rounded-3xl border p-5 text-left transition ${selectedNote?.id === note.id ? 'border-[var(--accent)] bg-blue-500/10 shadow-lg shadow-blue-500/10' : 'border-transparent bg-white/55 hover:border-[var(--accent)]/40 hover:bg-white/80'}`}
+                  className={`w-full rounded-3xl border p-5 text-left transition ${selectedNote?.id === note.id ? 'border-sky-400 bg-sky-100/70 shadow-lg shadow-sky-300/20' : 'border-sky-200/70 bg-white/65 hover:border-sky-400 hover:bg-white/90'}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <h2 className="line-clamp-1 text-lg font-bold">{note.problem.title}</h2>
@@ -238,10 +238,10 @@ export default function NotesLibrary() {
           </div>
         </section>
 
-        <section className="glass-card h-[calc(100vh-132px)] overflow-hidden p-6">
+        <section className="glass-card h-[calc(100vh-132px)] overflow-hidden border border-sky-300/80 p-6 shadow-[0_18px_44px_rgba(56,189,248,0.16)]">
           {selectedNote ? (
             <div className="flex h-full flex-col">
-              <div className="mb-5 flex items-start justify-between gap-5 border-b border-[var(--border)] pb-5">
+              <div className="mb-5 flex items-start justify-between gap-5 border-b border-sky-200/90 pb-5">
                 <div className="min-w-0">
                   <h2 className="truncate text-3xl font-bold tracking-tight">{selectedNote.problem.title}</h2>
                   <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--text-secondary)]">
@@ -362,12 +362,12 @@ export default function NotesLibrary() {
               ) : (
                 <>
                   {selectedNote.approach && (
-                    <div className="mb-5 rounded-3xl bg-white/55 p-5 shadow-sm">
+                    <div className="mb-5 rounded-3xl border border-sky-200/80 bg-white/70 p-5 shadow-sm">
                       <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)]">解题思路</p>
                       <p className="text-sm leading-7">{selectedNote.approach}</p>
                     </div>
                   )}
-                  <div className="min-h-0 flex-1 overflow-y-auto rounded-3xl bg-white/55 p-7 shadow-inner">
+                  <div className="min-h-0 flex-1 overflow-y-auto rounded-3xl border border-sky-200/80 bg-white/70 p-7 shadow-inner shadow-sky-100/70">
                     {viewMode === 'preview' ? (
                       <div data-color-mode="light" className="leetspace-note-markdown">
                         <MDEditor.Markdown source={selectedNote.content || '暂无详细笔记'} />
@@ -382,7 +382,7 @@ export default function NotesLibrary() {
               )}
             </div>
           ) : (
-            <div className="flex h-full items-center justify-center rounded-3xl border border-dashed border-[var(--border)] text-sm text-[var(--text-secondary)]">
+            <div className="flex h-full items-center justify-center rounded-3xl border border-dashed border-sky-300/90 text-sm text-[var(--text-secondary)]">
               选择一条笔记查看详情
             </div>
           )}
@@ -391,3 +391,5 @@ export default function NotesLibrary() {
     </div>
   );
 }
+
+

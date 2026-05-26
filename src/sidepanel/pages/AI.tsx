@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { chat, SYSTEM_PROMPT } from '@/services/ai';
+import { streamChat, SYSTEM_PROMPT } from '@/services/ai';
 import * as storage from '@/services/storage';
 import { Message } from '@/types';
 
@@ -222,13 +222,27 @@ export default function AI() {
         ...newMessages,
       ];
 
-      const reply = await chat(apiMessages, aiSettings);
-      setMessages([...newMessages, { role: 'assistant', content: reply }]);
+      const assistantIndex = newMessages.length;
+      setMessages([...newMessages, { role: 'assistant', content: '' }]);
+
+      await streamChat(apiMessages, aiSettings, (chunk) => {
+        setMessages((current) => current.map((message, index) => (
+          index === assistantIndex
+            ? { ...message, content: message.content + chunk }
+            : message
+        )));
+      });
     } catch (err) {
-      setMessages([
-        ...newMessages,
-        { role: 'assistant', content: `错误：${err instanceof Error ? err.message : '请求失败'}` },
-      ]);
+      const errorMessage = `错误：${err instanceof Error ? err.message : '请求失败'}`;
+      setMessages((current) => {
+        const assistantIndex = newMessages.length;
+        if (current[assistantIndex]?.role === 'assistant') {
+          return current.map((message, index) => (
+            index === assistantIndex ? { ...message, content: errorMessage } : message
+          ));
+        }
+        return [...newMessages, { role: 'assistant', content: errorMessage }];
+      });
     } finally {
       setLoading(false);
     }
@@ -298,23 +312,27 @@ export default function AI() {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`text-sm p-3 rounded-xl whitespace-pre-wrap list-item-enter ${
+            className={`text-sm p-3 rounded-2xl whitespace-pre-wrap list-item-enter shadow-sm ${
               msg.role === 'user'
-                ? 'bg-gradient-to-r from-[var(--accent)] to-purple-500 text-white ml-8'
-                : 'glass-card mr-8'
+                ? 'ml-10 bg-[#dff6ff] text-[#06324d] border border-sky-100'
+                : 'mr-8 bg-white/90 text-[#06324d] border border-sky-100'
             }`}
           >
             {msg.role === 'assistant' ? (
               <div data-color-mode="light" className="leetspace-ai-markdown">
-                <MDEditor.Markdown source={msg.content} />
+                {msg.content ? (
+                  <MDEditor.Markdown source={msg.content} />
+                ) : (
+                  <span className="inline-block animate-pulse text-[var(--text-secondary)]">正在生成...</span>
+                )}
               </div>
             ) : (
               msg.content
             )}
           </div>
         ))}
-        {loading && (
-          <div className="glass-card text-[var(--text-secondary)] text-sm p-3 mr-8">
+        {loading && messages[messages.length - 1]?.role !== 'assistant' && (
+          <div className="mr-8 rounded-2xl border border-sky-100 bg-white/90 p-3 text-sm text-[var(--text-secondary)] shadow-sm">
             <span className="inline-block animate-pulse">思考中...</span>
           </div>
         )}
@@ -341,3 +359,4 @@ export default function AI() {
     </div>
   );
 }
+
