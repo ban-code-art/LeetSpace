@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "LeetSpace",
+  "description": "力扣高效刷题工作台 - 计划管理、笔记沉淀、AI辅助",
+  "version": "0.1.0",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://leetcode.cn/*",
+    "https://leetcode.com/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "public/icons/icon-16.png",
+      "48": "public/icons/icon-48.png",
+      "128": "public/icons/icon-128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "options_page": "src/notes/index.html",
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://leetcode.cn/*", "*://leetcode.com/*"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "icons": {
+    "16": "public/icons/icon-16.png",
+    "48": "public/icons/icon-48.png",
+    "128": "public/icons/icon-128.png"
+  }
+}

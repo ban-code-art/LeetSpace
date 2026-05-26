@@ -1,0 +1,34 @@
+﻿<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="158" y1="70" x2="876" y2="962" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5B8CFF"/><stop offset="0.48" stop-color="#7556F6"/><stop offset="1" stop-color="#2B256D"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="365" y1="213" x2="720" y2="769" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#EDEBFF"/>
+    </linearGradient>
+    <linearGradient id="feather" x1="650" y1="438" x2="823" y2="669" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE463"/><stop offset="0.46" stop-color="#FF7B8C"/><stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <filter id="shadow" x="120" y="130" width="790" height="790" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="34" stdDeviation="38" flood-color="#1E1B4B" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
+  <circle cx="180" cy="165" r="88" fill="white" fill-opacity="0.10"/>
+  <circle cx="835" cy="820" r="138" fill="black" fill-opacity="0.13"/>
+  <g filter="url(#shadow)">
+    <rect x="272" y="238" width="430" height="552" rx="82" fill="#A78BFA" fill-opacity="0.55"/>
+    <rect x="308" y="214" width="446" height="576" rx="84" fill="url(#paper)"/>
+    <path d="M404 368H626" stroke="#B9A7F5" stroke-width="24" stroke-linecap="round"/>
+    <path d="M404 437H590" stroke="#C6B7F7" stroke-width="20" stroke-linecap="round"/>
+    <path d="M404 544H552" stroke="#B9A7F5" stroke-width="20" stroke-linecap="round"/>
+    <path d="M286 356H386M286 500H386M286 644H386" stroke="#F7F7FF" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="390" cy="356" r="30" fill="#5237E9"/><circle cx="390" cy="500" r="30" fill="#5237E9"/><circle cx="390" cy="644" r="30" fill="#5237E9"/>
+    <path d="M708 417C794 370 839 421 823 497C809 568 757 640 642 686C644 635 616 590 568 573C604 516 643 452 708 417Z" fill="url(#feather)"/>
+    <path d="M693 467C636 544 572 666 540 755" stroke="#FFFFFF" stroke-width="31" stroke-linecap="round"/>
+    <path d="M693 467C636 544 572 666 540 755" stroke="#E9E5FF" stroke-width="18" stroke-linecap="round"/>
+    <path d="M676 619L765 575" stroke="#FFFFFF" stroke-opacity="0.78" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="699" cy="292" r="48" fill="#34D399"/>
+    <path d="M678 292L693 307L724 270" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
