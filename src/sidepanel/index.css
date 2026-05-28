@@ -282,6 +282,36 @@ body::before {
   margin: 0.35em 0;
 }
 
+.leetspace-ai-markdown .wmde-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5em 0;
+  font-size: 13px;
+}
+
+.leetspace-ai-markdown .wmde-markdown table th,
+.leetspace-ai-markdown .wmde-markdown table td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.leetspace-ai-markdown .wmde-markdown table th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+}
+
+.leetspace-ai-markdown .wmde-markdown table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.leetspace-ai-markdown .wmde-markdown code {
+  background: rgba(56, 189, 248, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
 .leetspace-note-markdown .wmde-markdown {
   background: transparent;
   color: var(--text-primary);

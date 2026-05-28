@@ -130,7 +130,9 @@ export default function AI() {
   const [problemContext, setProblemContext] = useState<ProblemContext | null>(null);
   const [contextStatus, setContextStatus] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle');
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [autoScroll, setAutoScroll] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const chatStorageKey = problemContext?.titleSlug
     ? `${CHAT_STORAGE_PREFIX}${problemContext.titleSlug}`
     : contextStatus === 'empty' || contextStatus === 'error'
@@ -138,8 +140,24 @@ export default function AI() {
       : '';
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (autoScroll) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, autoScroll]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setAutoScroll(isNearBottom);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (!chatStorageKey) return;
@@ -303,7 +321,7 @@ export default function AI() {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-3 mb-3">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto space-y-3 mb-3">
         {messages.length === 0 && (
           <p className="text-center text-[var(--text-secondary)] text-sm py-4">
             点击快捷操作或输入问题开始对话
