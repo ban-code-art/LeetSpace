@@ -56,8 +56,10 @@ chrome.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
     void markProblemDone(msg.problem as Problem);
 
     chrome.storage.local.get(['leetspace:settings'], (result: Record<string, unknown>) => {
-      const settings = result['leetspace:settings'] as { ai?: { apiKey?: string }; notePrompts?: unknown[] } | undefined;
-      if (settings?.ai?.apiKey && settings?.notePrompts) {
+      const settings = result['leetspace:settings'] as { ai?: { apiKey?: string }; notePrompts?: Array<{ enabled?: boolean }> } | undefined;
+      const hasEnabledPrompts = settings?.notePrompts?.some((prompt) => prompt.enabled === true);
+
+      if (settings?.ai?.apiKey && hasEnabledPrompts) {
         chrome.storage.local.set({
           'leetspace:pending-note': {
             problem: msg.problem,
