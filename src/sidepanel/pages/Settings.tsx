@@ -25,7 +25,6 @@ export default function Settings() {
   const [testMessage, setTestMessage] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const enabledPromptCount = settings.notePrompts.filter((prompt) => prompt.enabled).length;
   const hasApiKey = Boolean(settings.ai.apiKey);
   const maskedKey = hasApiKey ? `已配置 · ${settings.ai.apiKey.slice(-4).padStart(8, '•')}` : '未配置 API Key';
   const widgetDisplaySummary = floatingDisplayOptions
@@ -149,21 +148,6 @@ export default function Settings() {
         <section className="glass-card p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold">自动笔记</h2>
-              <p className="text-xs text-[var(--text-secondary)] mt-1">已启用 {enabledPromptCount}/{settings.notePrompts.length} 个提示项</p>
-            </div>
-            <button
-              onClick={() => setShowAdvanced(true)}
-              className="text-xs px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] text-[var(--accent)] hover:bg-[var(--glass-bg)] transition-colors"
-            >
-              调整
-            </button>
-          </div>
-        </section>
-
-        <section className="glass-card p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
               <h2 className="text-sm font-semibold">悬浮窗</h2>
               <p className="text-xs text-[var(--text-secondary)] mt-1">{widgetSummary}</p>
             </div>
@@ -277,30 +261,6 @@ export default function Settings() {
                       <p className="text-xs text-[var(--danger)] mt-1">自定义模式下必须填写 Base URL</p>
                     )}
                   </div>
-                </div>
-              </section>
-
-              <hr className="border-[var(--border-glass)]" />
-
-              <section>
-                <h3 className="text-sm font-semibold mb-1">笔记自动生成提示词</h3>
-                <p className="text-xs text-[var(--text-secondary)] mb-3">提交成功后，AI 会根据勾选项自动生成笔记。</p>
-                <div className="space-y-2">
-                  {settings.notePrompts.map((prompt, i) => (
-                    <label key={prompt.key} className="flex items-center gap-2 text-sm cursor-pointer rounded-xl bg-[var(--bg-secondary)] px-3 py-2">
-                      <input
-                        type="checkbox"
-                        checked={prompt.enabled}
-                        onChange={() => {
-                          const notePrompts = [...settings.notePrompts];
-                          notePrompts[i] = { ...notePrompts[i], enabled: !notePrompts[i].enabled };
-                          update({ notePrompts });
-                        }}
-                        className="rounded"
-                      />
-                      {prompt.label}
-                    </label>
-                  ))}
                 </div>
               </section>
 
