@@ -31,14 +31,20 @@ export default function App() {
 
   useEffect(() => {
     const checkPendingNote = async () => {
+      if (generating) return;
+
       const pending = await storage.get<{ problem: Problem; timestamp: number }>('leetspace:pending-note');
-      if (!pending || generating) return;
+      if (!pending) return;
+
       if (Date.now() - pending.timestamp > 60000) {
         await storage.remove('leetspace:pending-note');
         return;
       }
 
+      // 立即删除 pending-note 防止重复触发
+      await storage.remove('leetspace:pending-note');
       setGenerating(true);
+
       try {
         const content = await generateNote(pending.problem, settings);
         if (content) {
@@ -46,7 +52,6 @@ export default function App() {
           setPage('notes');
         }
       } finally {
-        await storage.remove('leetspace:pending-note');
         setGenerating(false);
       }
     };
