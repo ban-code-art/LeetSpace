@@ -1,6 +1,6 @@
 {
   "name": "leetspace",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": false,
   "description": "A Chrome side panel extension for LeetCode planning, notes, AI assistance, and progress tracking.",
   "type": "module",

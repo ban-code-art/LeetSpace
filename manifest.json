@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LeetSpace",
   "description": "力扣高效刷题工作台 - 计划管理、笔记沉淀、AI辅助",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "permissions": [
     "sidePanel",
     "storage",
