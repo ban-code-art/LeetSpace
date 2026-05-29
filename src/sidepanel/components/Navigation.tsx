@@ -103,14 +103,16 @@ export default function Navigation({ current, onChange }: Props) {
           <button
             key={tab.key}
             onClick={() => onChange(tab.key)}
-            className={`group relative flex flex-col items-center rounded-2xl px-2 py-2.5 text-xs transition-all duration-200 ${
+            className={`group relative flex flex-col items-center rounded-2xl px-2 py-2.5 text-xs spring-transition active:scale-90 ${
               active
                 ? 'bg-white/90 text-sky-500 font-semibold shadow-[0_12px_28px_rgba(56,189,248,0.18)]'
-                : 'text-[var(--text-secondary)] hover:bg-white/55 hover:text-sky-500'
+                : 'text-[var(--text-secondary)] hover:bg-white/55 hover:text-sky-500 hover:scale-[1.02]'
             }`}
           >
-            {active && <span className="absolute inset-x-4 top-1 h-0.5 rounded-full bg-[var(--gradient-rainbow)]" />}
-            <span className={`mb-1 flex h-9 w-9 items-center justify-center rounded-2xl border transition-all duration-200 ${
+            {active && (
+              <span className="absolute inset-x-4 top-1 h-0.5 rounded-full bg-[var(--gradient-rainbow)] shadow-[0_0_8px_rgba(56,189,248,0.85)]" />
+            )}
+            <span className={`mb-1 flex h-9 w-9 items-center justify-center rounded-2xl border spring-transition ${
               active
                 ? 'border-sky-200 bg-sky-50 text-sky-500 shadow-inner shadow-sky-100 scale-105'
                 : 'border-transparent bg-transparent text-slate-500 group-hover:bg-sky-50 group-hover:text-sky-500'

@@ -106,13 +106,13 @@ export default function Notes({ initialProblem, onInitialProblemHandled }: Props
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="搜索题目或思路..."
-          className="w-full px-3 py-2 rounded-lg border border-[var(--border-glass)] bg-[var(--glass-bg)] backdrop-blur-sm text-sm text-[var(--text-primary)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-30"
+          className="w-full px-3 py-2 rounded-xl border border-[var(--border-glass)] bg-[var(--glass-bg)] backdrop-blur-sm text-sm text-[var(--text-primary)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-30"
         />
         {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 hide-scrollbar -mx-1 px-1 whitespace-nowrap">
             <button
               onClick={() => setTagFilter('')}
-              className={`tag-chip px-2 py-0.5 rounded-full text-xs ${!tagFilter ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)]'}`}
+              className={`tag-chip px-2.5 py-1 rounded-full text-xs font-semibold spring-transition ${!tagFilter ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-white shadow-md shadow-blue-500/15 scale-105' : 'bg-white/80 border border-slate-200/80 text-[var(--text-secondary)] hover:text-sky-500 hover:border-sky-300'}`}
             >
               全部
             </button>
@@ -120,7 +120,7 @@ export default function Notes({ initialProblem, onInitialProblemHandled }: Props
               <button
                 key={tag}
                 onClick={() => setTagFilter(tag === tagFilter ? '' : tag)}
-                className={`tag-chip px-2 py-0.5 rounded-full text-xs ${tag === tagFilter ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)]'}`}
+                className={`tag-chip px-2.5 py-1 rounded-full text-xs font-semibold spring-transition ${tag === tagFilter ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-white shadow-md shadow-blue-500/15 scale-105' : 'bg-white/80 border border-slate-200/80 text-[var(--text-secondary)] hover:text-sky-500 hover:border-sky-300'}`}
               >
                 {tag}
               </button>

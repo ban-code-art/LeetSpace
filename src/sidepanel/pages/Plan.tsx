@@ -66,7 +66,7 @@ function PlanGroupCard({ group, index, onOpenNote }: { group: PlanGroup; index: 
           <span className={`icon-tile bg-gradient-to-br ${visual.className}`}>{visual.icon}</span>
           <span className="min-w-0 flex-1">
             <span className="flex items-center gap-2">
-              <span className="text-xs text-[var(--text-secondary)]">{group.collapsed ? '▶' : '▼'}</span>
+              <span className="text-[10px] text-[var(--text-secondary)] spring-transition inline-block" style={{ transform: group.collapsed ? 'rotate(0deg)' : 'rotate(90deg)' }}>▶</span>
               <h2 className="truncate text-base font-bold tracking-tight">{group.title}</h2>
             </span>
             <span className="mt-2 block text-sm text-[var(--text-secondary)]">
@@ -165,7 +165,7 @@ export default function Plan({ onOpenNote }: Props) {
 
   return (
     <div className="page-enter space-y-5">
-      <section className="relative overflow-hidden rounded-[28px] border border-white/80 bg-white/70 p-5 shadow-[0_24px_60px_rgba(83,88,170,0.14)] backdrop-blur-xl">
+      <section className="relative overflow-hidden rounded-2xl border border-white/95 bg-white/80 p-5 shadow-[0_20px_50px_rgba(56,189,248,0.15)] backdrop-blur-xl">
         <div className="pointer-events-none absolute -right-8 top-8 h-36 w-36 rounded-full bg-blue-500/10 blur-2xl" />
         <div className="pointer-events-none absolute right-8 top-16 text-7xl opacity-20">🎯</div>
         <div className="relative z-10">

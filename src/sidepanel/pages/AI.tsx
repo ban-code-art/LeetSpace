@@ -308,13 +308,13 @@ export default function AI() {
         </div>
       )}
 
-      <div className="flex gap-1 mb-3 flex-wrap">
+      <div className="flex gap-1.5 mb-3 flex-wrap">
         {QUICK_ACTIONS.map((action) => (
           <button
             key={action.label}
             onClick={() => sendMessage(action.prompt)}
             disabled={loading || contextStatus === 'loading'}
-            className="btn-glass px-2 py-1 rounded-lg text-xs bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] disabled:opacity-50"
+            className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-white/85 text-slate-600 border border-slate-200/80 hover:text-sky-500 hover:border-sky-300 hover:scale-[1.03] spring-transition active:scale-95 disabled:opacity-50 shadow-sm"
           >
             {action.label}
           </button>
@@ -327,31 +327,42 @@ export default function AI() {
             点击快捷操作或输入问题开始对话
           </p>
         )}
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`text-sm p-3 rounded-2xl whitespace-pre-wrap list-item-enter shadow-sm ${
-              msg.role === 'user'
-                ? 'ml-10 bg-[#dff6ff] text-[#06324d] border border-sky-100'
-                : 'mr-8 bg-white/90 text-[#06324d] border border-sky-100'
-            }`}
-          >
-            {msg.role === 'assistant' ? (
-              <div data-color-mode="light" className="leetspace-ai-markdown">
-                {msg.content ? (
-                  <MDEditor.Markdown source={msg.content} />
-                ) : (
-                  <span className="inline-block animate-pulse text-[var(--text-secondary)]">正在生成...</span>
-                )}
-              </div>
-            ) : (
-              msg.content
-            )}
-          </div>
-        ))}
+        {messages.map((msg, i) => {
+          const isUser = msg.role === 'user';
+          return (
+            <div
+              key={i}
+              className={`text-sm p-3 rounded-2xl whitespace-pre-wrap list-item-enter shadow-md ${
+                isUser
+                  ? 'ml-10 bg-gradient-to-br from-sky-400 to-blue-500 text-white rounded-tr-none border-0 shadow-sky-500/10'
+                  : 'mr-8 bg-white/85 backdrop-blur-sm text-[#06324d] rounded-tl-none border border-white/90 shadow-slate-100/50'
+              }`}
+            >
+              {msg.role === 'assistant' ? (
+                <div data-color-mode="light" className="leetspace-ai-markdown">
+                  {msg.content ? (
+                    <MDEditor.Markdown source={msg.content} />
+                  ) : (
+                    <div className="flex items-center gap-1 py-1 px-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-bounce-dot" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-bounce-dot [animation-delay:0.15s]" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-bounce-dot [animation-delay:0.3s]" />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                msg.content
+              )}
+            </div>
+          );
+        })}
         {loading && messages[messages.length - 1]?.role !== 'assistant' && (
-          <div className="mr-8 rounded-2xl border border-sky-100 bg-white/90 p-3 text-sm text-[var(--text-secondary)] shadow-sm">
-            <span className="inline-block animate-pulse">思考中...</span>
+          <div className="mr-8 rounded-2xl rounded-tl-none border border-white/90 bg-white/85 p-3.5 shadow-md shadow-slate-100/50 w-fit">
+            <div className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-bounce-dot" />
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-bounce-dot [animation-delay:0.15s]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-bounce-dot [animation-delay:0.3s]" />
+            </div>
           </div>
         )}
         <div ref={bottomRef} />
@@ -364,12 +375,12 @@ export default function AI() {
           onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage(input))}
           placeholder="输入问题..."
           disabled={loading}
-          className="flex-1 px-3 py-2 rounded-lg border border-[var(--border-glass)] bg-[var(--glass-bg)] backdrop-blur-sm text-sm text-[var(--text-primary)] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-30 transition-all duration-200"
+          className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200/80 bg-white/85 backdrop-blur-sm text-sm text-[var(--text-primary)] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 focus:shadow-[0_0_12px_rgba(56,189,248,0.25)] spring-transition"
         />
         <button
           onClick={() => sendMessage(input)}
           disabled={loading || !input.trim()}
-          className="btn-glass px-3 py-2 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50"
+          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 shadow-md shadow-blue-500/15 text-white text-sm font-bold spring-transition active:scale-95 disabled:opacity-50"
         >
           发送
         </button>

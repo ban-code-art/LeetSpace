@@ -102,7 +102,10 @@ export default function NoteEditor({ note, initialProblem, onClose }: Props) {
   return (
     <div className="flex h-full min-h-0 flex-col slide-up-enter">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <button onClick={onClose} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+        <button
+          onClick={onClose}
+          className="px-3 py-1.5 rounded-xl bg-white/70 border border-slate-200/80 text-xs font-semibold text-[var(--text-secondary)] hover:text-sky-500 hover:border-sky-300 spring-transition active:scale-95"
+        >
           ← 返回
         </button>
         <div className="flex shrink-0 gap-2">
@@ -110,14 +113,14 @@ export default function NoteEditor({ note, initialProblem, onClose }: Props) {
             <button
               onClick={handleAiGenerate}
               disabled={aiGenerating || !title.trim()}
-              className="px-3 py-1.5 rounded-lg bg-sky-400 text-white text-sm font-medium hover:bg-sky-500 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-400 to-purple-500 hover:from-indigo-500 hover:to-purple-600 text-white text-xs font-bold shadow-md shadow-indigo-500/15 spring-transition active:scale-95 disabled:opacity-50"
             >
-              {aiGenerating ? 'AI 生成中...' : 'AI 生成笔记'}
+              {aiGenerating ? '✨ 生成中...' : '✨ AI 生成'}
             </button>
           )}
           <button
             onClick={handleSave}
-            className="px-3 py-1.5 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:bg-[var(--accent-hover)]"
+            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold shadow-md shadow-blue-500/15 spring-transition active:scale-95"
           >
             保存
           </button>
@@ -170,36 +173,54 @@ export default function NoteEditor({ note, initialProblem, onClose }: Props) {
             />
 
             <div>
-              <label className="mb-1 block text-xs text-[var(--text-secondary)]">个人难度评分</label>
-              <div className="flex gap-1">
-                {([1, 2, 3, 4, 5] as const).map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => setDifficulty(d)}
-                    className={`h-8 w-8 rounded-lg text-sm font-medium ${
-                      d <= difficulty ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)]'
-                    }`}
-                  >
-                    {d}
-                  </button>
-                ))}
+              <label className="mb-1.5 block text-xs text-[var(--text-secondary)]">个人难度评分</label>
+              <div className="flex gap-1.5 bg-slate-100/50 p-1 rounded-2xl border border-slate-200/40 w-fit">
+                {([1, 2, 3, 4, 5] as const).map((d) => {
+                  const isActive = d === difficulty;
+                  const colors = [
+                    '',
+                    'bg-emerald-500 text-white shadow-md shadow-emerald-500/20', // 1
+                    'bg-teal-500 text-white shadow-md shadow-teal-500/20',       // 2
+                    'bg-amber-500 text-white shadow-md shadow-amber-500/20',     // 3
+                    'bg-orange-500 text-white shadow-md shadow-orange-500/20',   // 4
+                    'bg-rose-500 text-white shadow-md shadow-rose-500/20',       // 5
+                  ];
+                  return (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setDifficulty(d)}
+                      className={`h-8 w-8 rounded-xl text-xs font-bold spring-transition active:scale-90 ${
+                        isActive ? colors[d] : 'bg-white border border-slate-200/80 text-[var(--text-secondary)] hover:text-sky-500 hover:border-sky-300'
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs text-[var(--text-secondary)]">算法标签</label>
-              <div className="mb-2 flex gap-1 overflow-x-auto pb-1 whitespace-nowrap">
-                {COMMON_TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`shrink-0 rounded-full px-3 py-1 text-xs ${
-                      tags.includes(tag) ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)]'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
+              <label className="mb-1 block text-xs text-[var(--text-secondary)] font-semibold">算法标签</label>
+              <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1.5 hide-scrollbar whitespace-nowrap -mx-1 px-1">
+                {COMMON_TAGS.map((tag) => {
+                  const isSelected = tags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold spring-transition active:scale-95 ${
+                        isSelected
+                          ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-white shadow-sm shadow-blue-500/15 scale-[1.03]'
+                          : 'bg-white/80 border border-slate-200/80 text-[var(--text-secondary)] hover:text-sky-500 hover:border-sky-300'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
               </div>
               <div className="flex gap-1">
                 <input
