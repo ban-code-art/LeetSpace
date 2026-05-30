@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #f4fbff;
-  --bg-secondary: rgba(255, 255, 255, 0.78);
+  --bg-primary: #ffffff;
+  --bg-secondary: rgba(248, 250, 252, 0.92);
   --text-primary: #06324d;
   --text-secondary: #5d7890;
   --border: rgba(170, 220, 255, 0.66);
@@ -14,58 +14,28 @@
   --accent-2: #22d3ee;
   --success: #10b981;
   --danger: #ef4444;
-  --glass-bg: rgba(255, 255, 255, 0.82);
-  --glass-blur: 18px;
-  --glass-shadow: 0 18px 50px rgba(56, 189, 248, 0.12);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.82);
-  --glass-glow: 0 0 0 1px rgba(56, 189, 248, 0.14);
+  --glass-bg: rgba(255, 255, 255, 0.96);
+  --glass-blur: 10px;
+  --glass-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+  --glass-border: 1px solid rgba(191, 229, 255, 0.72);
+  --glass-glow: 0 0 0 1px rgba(56, 189, 248, 0.08);
   --gradient-primary: linear-gradient(135deg, #38bdf8 0%, #67e8f9 45%, #ffffff 100%);
   --gradient-rainbow: linear-gradient(90deg, #38bdf8 0%, #22d3ee 22%, #86efac 45%, #fde68a 68%, #f9a8d4 100%);
   --soft-rainbow: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(134, 239, 172, 0.10), rgba(249, 168, 212, 0.10));
   --soft-blue: rgba(56, 189, 248, 0.13);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #0f172a;
-    --bg-secondary: rgba(30, 41, 59, 0.6);
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border: rgba(51, 65, 85, 0.6);
-    --border-glass: rgba(51, 65, 85, 0.4);
-    --accent: #38bdf8;
-    --accent-hover: #0ea5e9;
-    --success: #34d399;
-    --danger: #f87171;
-    --glass-bg: rgba(30, 41, 59, 0.65);
-    --glass-blur: 12px;
-    --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    --glass-border: 1px solid rgba(51, 65, 85, 0.6);
-    --glass-glow: 0 0 0 1px rgba(96, 165, 250, 0.15);
-  }
-}
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(56, 189, 248, 0.22), transparent 28%),
-    radial-gradient(circle at 92% 14%, rgba(125, 211, 252, 0.20), transparent 30%),
-    radial-gradient(circle at 88% 78%, rgba(134, 239, 172, 0.12), transparent 26%),
-    linear-gradient(180deg, #f8fdff 0%, #eef9ff 100%);
+  background: #ffffff;
   color: var(--text-primary);
   width: 100%;
   min-height: 100vh;
 }
 
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(255,255,255,0.72), transparent 35%, rgba(255,255,255,0.58)),
-    radial-gradient(circle at 80% 72%, rgba(56, 189, 248, 0.10), transparent 32%);
+  content: none;
 }
 
 * {
@@ -343,14 +313,24 @@ body::before {
 
 /* --- Added Beautification Styles --- */
 
-/* High-end Dark Slate Code Blocks for Markdown */
-.leetspace-ai-markdown .wmde-markdown pre,
+/* Readable Markdown code blocks */
+.leetspace-ai-markdown .wmde-markdown pre {
+  background: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  padding: 0.875rem 1rem !important;
+  position: relative;
+  overflow-x: auto;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  margin: 0.75rem 0 !important;
+}
+
 .leetspace-note-markdown .wmde-markdown pre {
   background: #0f172a !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 1rem 1rem 1rem !important;
+  padding: 1rem !important;
   position: relative;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
   border-radius: 12px;
   margin: 0.75rem 0 !important;
@@ -358,6 +338,10 @@ body::before {
 
 /* Simulated Mac-style dots */
 .leetspace-ai-markdown .wmde-markdown pre::before,
+.leetspace-note-markdown .wmde-markdown pre::before {
+  content: none;
+}
+
 .leetspace-note-markdown .wmde-markdown pre::before {
   content: '';
   display: block;
@@ -373,7 +357,26 @@ body::before {
   opacity: 0.85;
 }
 
-.leetspace-ai-markdown .wmde-markdown pre code,
+.leetspace-ai-markdown .wmde-markdown pre code {
+  color: #0f172a !important;
+  background: transparent !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.65;
+  padding: 0 !important;
+  display: block;
+  text-shadow: none !important;
+  white-space: pre;
+}
+
+.leetspace-ai-markdown .wmde-markdown pre code *,
+.leetspace-ai-markdown .wmde-markdown pre span {
+  color: #0f172a !important;
+  background: transparent !important;
+  text-shadow: none !important;
+}
+
 .leetspace-note-markdown .wmde-markdown pre code {
   color: #e2e8f0 !important;
   background: transparent !important;
